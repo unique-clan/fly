@@ -60,6 +60,12 @@ public:
 	bool IsAlive() const { return m_Alive; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 	
+	// fly
+	int m_HitTick;
+	int m_LastHitBy;
+	
+	CCharacterCore *Core() { return &m_Core; }
+	
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;

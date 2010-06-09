@@ -7,10 +7,14 @@
 #include <game/version.h>
 #include <game/collision.h>
 #include <game/gamecore.h>
+
+/* no need for this
 #include "gamemodes/dm.h"
 #include "gamemodes/tdm.h"
 #include "gamemodes/ctf.h"
-#include "gamemodes/mod.h"
+#include "gamemodes/mod.h"*/
+
+#include "gamemodes/fly.h"
 
 enum
 {
@@ -137,7 +141,14 @@ void CGameContext::CreateExplosion(vec2 p, int Owner, int Weapon, bool NoDamage)
 			l = 1-clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
 			float Dmg = 6 * l;
 			if((int)Dmg)
-				apEnts[i]->TakeDamage(ForceDir*Dmg*2, (int)Dmg, Owner, Weapon);
+			{
+				if(Weapon == WEAPON_GRENADE)
+				{
+					apEnts[i]->m_LastHitBy = Owner;
+					apEnts[i]->m_HitTick = Server()->Tick();
+				}
+ 				apEnts[i]->TakeDamage(ForceDir*Dmg*2, (int)Dmg, Owner, Weapon);
+			}
 		}
 	}
 }
@@ -504,6 +515,34 @@ void CGameContext::OnClientEnter(int ClientId)
 	SendChat(-1, CGameContext::CHAT_ALL, aBuf); 
 
 	dbg_msg("game", "team_join player='%d:%s' team=%d", ClientId, Server()->ClientName(ClientId), m_apPlayers[ClientId]->GetTeam());
+
+	// Anti multi connect client
+	if(!g_Config.m_SvMulticonnect)
+	{
+		char aAddr[16];
+		m_pServer->GetClientIP(ClientId, aAddr, sizeof(aAddr));
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if((i != ClientId) && m_apPlayers[i])
+			{
+				char aAddr2[16];
+				m_pServer->GetClientIP(i, aAddr2, sizeof(aAddr2));
+				if(str_comp(aAddr, aAddr2) == 0)
+				{					
+					// tell it everyone
+					str_format(aBuf, sizeof(aBuf), "%s got banned due to using an illegal client.", Server()->ClientName(ClientId));
+					SendChatTarget(-1, aBuf);
+					
+					// ban him for life \o/
+					NETADDR Adrr2Ban;
+					net_addr_from_str(&Adrr2Ban, aAddr);
+					m_pServer->BanAdd(Adrr2Ban, 0);
+					
+					return;
+				}
+			}
+		}
+	}
 
 	m_VoteUpdate = true;
 }
@@ -975,14 +1014,17 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	//players = new CPlayer[MAX_CLIENTS];
 
 	// select gametype
-	if(str_comp(g_Config.m_SvGametype, "mod") == 0)
+	/*if(str_comp(g_Config.m_SvGametype, "mod") == 0)
 		m_pController = new CGameControllerMOD(this);
 	else if(str_comp(g_Config.m_SvGametype, "ctf") == 0)
 		m_pController = new CGameControllerCTF(this);
 	else if(str_comp(g_Config.m_SvGametype, "tdm") == 0)
 		m_pController = new CGameControllerTDM(this);
 	else
-		m_pController = new CGameControllerDM(this);
+		m_pController = new CGameControllerDM(this);*/
+	
+	// fly
+	m_pController = new CGameControllerFLY(this); 
 
 	Server()->SetBrowseInfo(m_pController->m_pGameType, -1);
 

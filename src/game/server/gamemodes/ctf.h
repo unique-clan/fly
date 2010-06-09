@@ -1,4 +1,4 @@
-#ifndef GAME_SERVER_GAMEMODES_CTF_H
+/*#ifndef GAME_SERVER_GAMEMODES_CTF_H
 #define GAME_SERVER_GAMEMODES_CTF_H
 #include <game/server/gamecontroller.h>
 #include <game/server/entity.h>
@@ -35,5 +35,5 @@ public:
 	virtual void Reset();
 	virtual void Snap(int SnappingClient);
 };
-#endif
+#endif*/
 

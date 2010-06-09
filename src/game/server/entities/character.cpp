@@ -1,6 +1,7 @@
 #include <new>
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
+#include <game/server/gamemodes/fly.h>
 #include <game/mapitems.h>
 
 #include "character.h"
@@ -73,6 +74,10 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	
 	GameServer()->m_World.InsertEntity(this);
 	m_Alive = true;
+	
+	// fly
+	m_HitTick = -1;
+	m_LastHitBy = -1;
 
 	GameServer()->m_pController->OnCharacterSpawn(this);
 
@@ -542,6 +547,53 @@ void CCharacter::Tick()
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 	
+	// teleporter
+	int z = GameServer()->Collision()->IsTeleport(m_Pos.x, m_Pos.y);
+	if(g_Config.m_SvTeleport && z)
+	{
+		m_Core.m_HookedPlayer = -1;
+		m_Core.m_HookState = HOOK_RETRACTED;
+		m_Core.m_TriggeredEvents |= COREEVENT_HOOK_RETRACT;
+		m_Core.m_HookState = HOOK_RETRACTED;
+		m_Core.m_Pos = ((CGameControllerFLY*)GameServer()->m_pController)->m_pTeleporter[z-1];
+		
+		// kill on teleport
+		if(g_Config.m_SvTeleportKill)
+		{
+			for(int i = 0; i < MAX_CLIENTS; i++)
+				if(GameServer()->GetPlayerChar(i) && distance(GameServer()->GetPlayerChar(i)->m_Pos, m_Core.m_Pos) < 32)
+					GameServer()->GetPlayerChar(i)->Die(m_pPlayer->GetCID(), WEAPON_GAME);
+		}
+		
+		m_Core.m_HookPos = m_Core.m_Pos;
+		//Resetting velocity to prevent exploit
+		if(g_Config.m_SvTeleportVelReset)
+			m_Core.m_Vel = vec2(0,0);
+		if(g_Config.m_SvStrip)
+		{
+			m_ActiveWeapon = WEAPON_HAMMER;
+			m_LastWeapon = WEAPON_HAMMER;
+			m_aWeapons[0].m_Got = true;
+			for(int i = 1; i < NUM_WEAPONS; i++)
+			m_aWeapons[i].m_Got = false;
+		}
+	}
+
+	// player <-> player collision
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CCharacter *pChar = GameServer()->GetPlayerChar(i);
+		
+		if(!pChar || pChar == this)
+			continue;
+			
+		if(distance(m_Pos, pChar->m_Pos) < ms_PhysSize*1.25f)
+		{
+			pChar->m_LastHitBy = m_pPlayer->GetCID();
+			pChar->m_HitTick = Server()->Tick();
+		}
+	}
+
 	// handle death-tiles
 	if(GameServer()->Collision()->GetCollisionAt(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f)&CCollision::COLFLAG_DEATH ||
 		GameServer()->Collision()->GetCollisionAt(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f)&CCollision::COLFLAG_DEATH ||
@@ -648,6 +700,12 @@ bool CCharacter::IncreaseArmor(int Amount)
 
 void CCharacter::Die(int Killer, int Weapon)
 {
+	if(Killer == m_pPlayer->GetCID() && m_LastHitBy > -1 && m_HitTick+Server()->TickSpeed()*g_Config.m_SvDieDelay > Server()->Tick())
+	{
+		if(GameServer()->m_apPlayers[m_LastHitBy])
+			Killer = m_LastHitBy;
+	}
+
 	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon);
 
 	dbg_msg("game", "kill killer='%d:%s' victim='%d:%s' weapon=%d special=%d",

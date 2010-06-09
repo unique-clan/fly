@@ -1,5 +1,7 @@
+#include <engine/shared/config.h>
 #include <game/generated/protocol.h>
 #include <game/server/gamecontext.h>
+#include <game/server/gamemodes/fly.h>
 #include "projectile.h"
 
 CProjectile::CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, vec2 Dir, int Span,
@@ -77,6 +79,14 @@ void CProjectile::Tick()
 			TargetChr->TakeDamage(m_Direction * max(0.001f, m_Force), m_Damage, m_Owner, m_Weapon);
 
 		GameServer()->m_World.DestroyEntity(this);
+		return;
+	}
+	
+	int z = GameServer()->Collision()->IsTeleport((int)CurPos.x,(int)CurPos.y);
+  	if(g_Config.m_SvTeleport && z && g_Config.m_SvTeleportGrenade && m_Weapon == WEAPON_GRENADE)
+  	{
+ 		m_Pos = ((CGameControllerFLY*)GameServer()->m_pController)->m_pTeleporter[z-1];
+  		m_StartTick = Server()->Tick();
 	}
 }
 

@@ -17,6 +17,7 @@ CCollision::CCollision()
 	m_Width = 0;
 	m_Height = 0;
 	m_pLayers = 0;
+	m_pTele = 0;
 }
 
 void CCollision::Init(class CLayers *pLayers)
@@ -25,6 +26,8 @@ void CCollision::Init(class CLayers *pLayers)
 	m_Width = m_pLayers->GameLayer()->m_Width;
 	m_Height = m_pLayers->GameLayer()->m_Height;
 	m_pTiles = static_cast<CTile *>(m_pLayers->Map()->GetData(m_pLayers->GameLayer()->m_Data));
+	if(m_pLayers->TeleLayer())
+		m_pTele = static_cast<CTeleTile *>(m_pLayers->Map()->GetData(m_pLayers->TeleLayer()->m_Tele));
 	
 	for(int i = 0; i < m_Width*m_Height; i++)
 	{
@@ -55,12 +58,30 @@ int CCollision::GetTile(int x, int y)
 	int nx = clamp(x/32, 0, m_Width-1);
 	int ny = clamp(y/32, 0, m_Height-1);
 	
-	return m_pTiles[ny*m_Width+nx].m_Index > 128 ? 0 : m_pTiles[ny*m_Width+nx].m_Index;
+	if(m_pTiles[ny*m_Width+nx].m_Index == COLFLAG_SOLID || m_pTiles[ny*m_Width+nx].m_Index == (COLFLAG_SOLID|COLFLAG_NOHOOK) || m_pTiles[ny*m_Width+nx].m_Index == COLFLAG_DEATH)
+		return m_pTiles[ny*m_Width+nx].m_Index;
+	else
+		return 0;
 }
 
 bool CCollision::IsTileSolid(int x, int y)
 {
 	return GetTile(x,y)&COLFLAG_SOLID;
+}
+
+int CCollision::IsTeleport(int x, int y)
+{
+	if(!m_pTele)
+		return 0;
+	
+	int nx = clamp(x/32, 0, m_Width-1);
+	int ny = clamp(y/32, 0, m_Height-1);
+	
+	int Tele = 0;
+	if(m_pTele[ny*m_pLayers->TeleLayer()->m_Width+nx].m_Type == TILE_TELEIN)
+		Tele = m_pTele[ny*m_pLayers->TeleLayer()->m_Width+nx].m_Number;
+		
+	return Tele;
 }
 
 // TODO: rewrite this smarter!

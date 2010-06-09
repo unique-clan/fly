@@ -32,6 +32,13 @@ public:
 	void MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *Bpounces);
 	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity);
 	bool TestBox(vec2 Pos, vec2 Size);
+	
+	// teleporter stuff
+	int IsTeleport(int x, int y);
+	
+	class CTeleTile *m_pTele;
+	
+	class CLayers *Layers() { return m_pLayers; }
 };
 
 #endif
