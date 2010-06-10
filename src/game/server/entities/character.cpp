@@ -594,6 +594,16 @@ void CCharacter::Tick()
 		}
 	}
 
+	// check hook state
+	if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer > -1)
+	{
+		if(GameServer()->GetPlayerChar(m_Core.m_HookedPlayer))
+		{
+			GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_LastHitBy = m_pPlayer->GetCID();
+			GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_HitTick = Server()->Tick();
+		}
+	}
+	
 	// handle death-tiles
 	if(GameServer()->Collision()->GetCollisionAt(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f)&CCollision::COLFLAG_DEATH ||
 		GameServer()->Collision()->GetCollisionAt(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f)&CCollision::COLFLAG_DEATH ||

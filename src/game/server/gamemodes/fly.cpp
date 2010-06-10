@@ -115,23 +115,6 @@ void CGameControllerFLY::Tick()
 
 	DoTeamScoreWincheck();
 	
-	// check hook state
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(!GameServer()->GetPlayerChar(i))
-			continue;
-			
-		if(GameServer()->GetPlayerChar(i)->Core()->m_HookState == HOOK_GRABBED && GameServer()->GetPlayerChar(i)->Core()->m_HookedPlayer > -1)
-		{
-			int HookedPlayer = GameServer()->GetPlayerChar(i)->Core()->m_HookedPlayer;
-			if(GameServer()->GetPlayerChar(HookedPlayer))
-			{
-				GameServer()->GetPlayerChar(HookedPlayer)->m_LastHitBy = i;
-				GameServer()->GetPlayerChar(HookedPlayer)->m_HitTick = Server()->Tick();
-			}
-		}
-	}
-	
 	// flag stuff
 	for(int fi = 0; fi < 2; fi++)
 	{
@@ -171,6 +154,10 @@ void CGameControllerFLY::Tick()
 					if(CaptureTime <= 60)
 					{
 						str_format(Buf, sizeof(Buf), "The %s flag was captured by %s (%d.%s%d seconds)", fi ? "blue" : "red", Server()->ClientName(F->m_pCarryingCCharacter->GetPlayer()->GetCID()), (int)CaptureTime%60, ((int)(CaptureTime*100)%100)<10?"0":"", (int)(CaptureTime*100)%100);
+					}
+					else if(CaptureTime <= 3600)
+					{
+						str_format(Buf, sizeof(Buf), "The %s flag was captured by %s (%d minutes %d.%s%d seconds)", fi ? "blue" : "red", Server()->ClientName(F->m_pCarryingCCharacter->GetPlayer()->GetCID()), (int)(CaptureTime/60), (int)CaptureTime%60, ((int)(CaptureTime*100)%100)<10?"0":"", (int)(CaptureTime*100)%100);
 					}
 					else
 					{
