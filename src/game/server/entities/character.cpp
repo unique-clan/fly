@@ -580,27 +580,33 @@ void CCharacter::Tick()
 	}
 
 	// player <-> player collision
-	for(int i = 0; i < MAX_CLIENTS; i++)
+	if(GameServer()->Tuning()->m_PlayerCollision)
 	{
-		CCharacter *pChar = GameServer()->GetPlayerChar(i);
-		
-		if(!pChar || pChar == this)
-			continue;
-			
-		if(distance(m_Pos, pChar->m_Pos) < ms_PhysSize*1.25f)
+		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
-			pChar->m_LastHitBy = m_pPlayer->GetCID();
-			pChar->m_HitTick = Server()->Tick();
+			CCharacter *pChar = GameServer()->GetPlayerChar(i);
+			
+			if(!pChar || pChar == this)
+				continue;
+				
+			if(distance(m_Pos, pChar->m_Pos) < ms_PhysSize*1.25f)
+			{
+				pChar->m_LastHitBy = m_pPlayer->GetCID();
+				pChar->m_HitTick = Server()->Tick();
+			}
 		}
 	}
 
 	// check hook state
-	if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer > -1)
+	if(GameServer()->Tuning()->m_PlayerHooking)
 	{
-		if(GameServer()->GetPlayerChar(m_Core.m_HookedPlayer))
+		if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer > -1)
 		{
-			GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_LastHitBy = m_pPlayer->GetCID();
-			GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_HitTick = Server()->Tick();
+			if(GameServer()->GetPlayerChar(m_Core.m_HookedPlayer))
+			{
+				GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_LastHitBy = m_pPlayer->GetCID();
+				GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_HitTick = Server()->Tick();
+			}
 		}
 	}
 	
