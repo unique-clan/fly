@@ -598,15 +598,12 @@ void CCharacter::Tick()
 	}
 
 	// check hook state
-	if(GameServer()->Tuning()->m_PlayerHooking)
+	if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer > -1)
 	{
-		if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer > -1)
+		if(GameServer()->GetPlayerChar(m_Core.m_HookedPlayer))
 		{
-			if(GameServer()->GetPlayerChar(m_Core.m_HookedPlayer))
-			{
-				GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_LastHitBy = m_pPlayer->GetCID();
-				GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_HitTick = Server()->Tick();
-			}
+			GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_LastHitBy = m_pPlayer->GetCID();
+			GameServer()->GetPlayerChar(m_Core.m_HookedPlayer)->m_HitTick = Server()->Tick();
 		}
 	}
 	
