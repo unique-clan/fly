@@ -1964,7 +1964,7 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// create the components
 	IConsole *pConsole = CreateConsole(CFGFLAG_CLIENT);
-	IStorage *pStorage = CreateStorage("Teeworlds", argv[0]); // ignore_convention
+	IStorage *pStorage = CreateStorage("Teeworlds", argc, argv); // ignore_convention
 	IConfig *pConfig = CreateConfig();
 	IEngineGraphics *pEngineGraphics = CreateEngineGraphics();
 	IEngineSound *pEngineSound = CreateEngineSound();
@@ -2026,6 +2026,8 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// execute config file
 	pConsole->ExecuteFile("settings.cfg");
+
+	m_Client.Engine()->InitLogfile();
 
 	// run the client
 	m_Client.Run();
