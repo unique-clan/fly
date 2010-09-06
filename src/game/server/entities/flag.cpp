@@ -1,14 +1,12 @@
-#include <game/generated/protocol.h>
 #include <game/server/gamecontext.h>
 #include "flag.h"
-#include "character.h"
 
 CFlag::CFlag(CGameWorld *pGameWorld, int Team)
 : CEntity(pGameWorld, NETOBJTYPE_FLAG)
 {
 	m_Team = Team;
-	m_ProximityRadius = m_PhysSize;
-	m_pCarryingCCharacter = 0x0;
+	m_ProximityRadius = ms_PhysSize;
+	m_pCarryingCharacter = NULL;
 	m_GrabTick = 0;
 	
 	Reset();
@@ -16,7 +14,7 @@ CFlag::CFlag(CGameWorld *pGameWorld, int Team)
 
 void CFlag::Reset()
 {
-	m_pCarryingCCharacter = 0x0;
+	m_pCarryingCharacter = NULL;
 	m_AtStand = 1;
 	m_Pos = m_StandPos;
 	m_Vel = vec2(0,0);
@@ -33,6 +31,6 @@ void CFlag::Snap(int SnappingClient)
 	
 	if(m_AtStand)
 		pFlag->m_CarriedBy = -2;
-	else if(m_pCarryingCCharacter && m_pCarryingCCharacter->GetPlayer())
-		pFlag->m_CarriedBy = m_pCarryingCCharacter->GetPlayer()->GetCID();
+	else if(m_pCarryingCharacter && m_pCarryingCharacter->GetPlayer())
+		pFlag->m_CarriedBy = m_pCarryingCharacter->GetPlayer()->GetCID();
 }
