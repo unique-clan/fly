@@ -1,4 +1,4 @@
-#ifndef GAME_SERVER_GAMEMODES_CTF_H
+/*#ifndef GAME_SERVER_GAMEMODES_CTF_H
 #define GAME_SERVER_GAMEMODES_CTF_H
 #include <game/server/gamecontroller.h>
 #include <game/server/entity.h>
@@ -16,5 +16,5 @@ public:
 	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
 };
 
-#endif
+#endif*/
 
