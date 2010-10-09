@@ -53,6 +53,7 @@ public:
 	virtual int BanAdd(NETADDR Addr, int Seconds) = 0;
 	
 	virtual bool IsAuthed(int ClientID) = 0;
+	virtual void Kick(int ClientID, const char *pReason) = 0;
 };
 
 class IGameServer : public IInterface
