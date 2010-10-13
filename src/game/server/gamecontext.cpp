@@ -536,7 +536,7 @@ void CGameContext::OnClientEnter(int ClientId)
 					// ban him for life \o/
 					NETADDR Adrr2Ban;
 					net_addr_from_str(&Adrr2Ban, aAddr);
-					m_pServer->BanAdd(Adrr2Ban, 0);
+					m_pServer->BanAdd(Adrr2Ban, 0, "banned due to using an illegal client");
 					
 					return;
 				}
