@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 #include <engine/graphics.h>
+#include <engine/demo.h>
 
 #include <game/generated/client_data.h>
 #include <game/client/render.h>
