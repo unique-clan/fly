@@ -522,17 +522,17 @@ void CGameContext::OnClientEnter(int ClientID)
 	if(!g_Config.m_SvMulticonnect)
 	{
 		char aAddr[16];
-		m_pServer->GetClientIP(ClientId, aAddr, sizeof(aAddr));
+		m_pServer->GetClientIP(ClientID, aAddr, sizeof(aAddr));
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if((i != ClientId) && m_apPlayers[i])
+			if((i != ClientID) && m_apPlayers[i])
 			{
 				char aAddr2[16];
 				m_pServer->GetClientIP(i, aAddr2, sizeof(aAddr2));
 				if(str_comp(aAddr, aAddr2) == 0)
 				{					
 					// tell it everyone
-					str_format(aBuf, sizeof(aBuf), "%s got banned due to using an illegal client.", Server()->ClientName(ClientId));
+					str_format(aBuf, sizeof(aBuf), "%s got banned due to using an illegal client.", Server()->ClientName(ClientID));
 					SendChatTarget(-1, aBuf);
 					
 					// ban him for life \o/

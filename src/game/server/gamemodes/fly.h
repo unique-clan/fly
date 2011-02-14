@@ -13,7 +13,7 @@ public:
 	
 	void InitTeleporter();
 	
-	virtual bool CanBeMovedOnBalance(int Cid);
+	virtual bool CanBeMovedOnBalance(int ClientID);
 	virtual void Tick();
 	
 	virtual bool OnEntity(int Index, vec2 Pos);
