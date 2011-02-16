@@ -1073,8 +1073,6 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	// fly
 	m_pController = new CGameControllerFLY(this); 
 
-	Server()->SetBrowseInfo(m_pController->m_pGameType, -1);
-
 	// setup core world
 	//for(int i = 0; i < MAX_CLIENTS; i++)
 	//	game.players[i].core.world = &game.world.core;
@@ -1144,6 +1142,7 @@ void CGameContext::OnPostSnap()
 	m_Events.Clear();
 }
 
+const char *CGameContext::GameType() { return m_pController && m_pController->m_pGameType ? m_pController->m_pGameType : ""; }
 const char *CGameContext::Version() { return GAME_VERSION; }
 const char *CGameContext::NetVersion() { return GAME_NETVERSION; }
 
