@@ -73,8 +73,6 @@ MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SERVER, "Allow votin
 MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
 
 /* Fly */
-MACRO_CONFIG_INT(SvMulticonnect, sv_multiconnect, 0, 0, 1, CFGFLAG_SERVER, "Allow multi connections on the server")
-
 MACRO_CONFIG_INT(SvDieDelay, sv_die_delay, 2, 0, 60, CFGFLAG_SERVER, "Time delay for dying")
 
 MACRO_CONFIG_INT(SvStrip, sv_strip, 0, 0, 1, CFGFLAG_SERVER, "Enable or disable keeping weapon after teleporting")

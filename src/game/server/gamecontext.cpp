@@ -518,34 +518,6 @@ void CGameContext::OnClientEnter(int ClientID)
 	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), m_apPlayers[ClientID]->GetTeam());
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
-	// Anti multi connect client
-	if(!g_Config.m_SvMulticonnect)
-	{
-		char aAddr[16];
-		m_pServer->GetClientIP(ClientID, aAddr, sizeof(aAddr));
-		for(int i = 0; i < MAX_CLIENTS; i++)
-		{
-			if((i != ClientID) && m_apPlayers[i])
-			{
-				char aAddr2[16];
-				m_pServer->GetClientIP(i, aAddr2, sizeof(aAddr2));
-				if(str_comp(aAddr, aAddr2) == 0)
-				{					
-					// tell it everyone
-					str_format(aBuf, sizeof(aBuf), "%s got banned due to using an illegal client.", Server()->ClientName(ClientID));
-					SendChatTarget(-1, aBuf);
-					
-					// ban him for life \o/
-					NETADDR Adrr2Ban;
-					net_addr_from_str(&Adrr2Ban, aAddr);
-					m_pServer->BanAdd(Adrr2Ban, 0, "banned due to using an illegal client");
-					
-					return;
-				}
-			}
-		}
-	}
-
 	m_VoteUpdate = true;
 }
 
