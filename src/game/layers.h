@@ -26,7 +26,7 @@ public:
 	CMapItemLayerTilemap *GameLayer() const { return m_pGameLayer; };
 	CMapItemLayerTilemap *TeleLayer() const { return m_pTeleLayer; };
 	CMapItemGroup *GetGroup(int Index) const;
-	CMapItemLayer *GetLayer(int Index) const;	
+	CMapItemLayer *GetLayer(int Index) const;
 };
 
 #endif
