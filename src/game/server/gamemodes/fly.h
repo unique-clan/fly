@@ -14,6 +14,7 @@ public:
 	void InitTeleporter();
 	
 	virtual bool CanBeMovedOnBalance(int ClientID);
+	virtual void Snap(int SnappingClient);
 	virtual void Tick();
 	
 	virtual bool OnEntity(int Index, vec2 Pos);

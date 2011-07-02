@@ -109,6 +109,41 @@ bool CGameControllerFLY::CanBeMovedOnBalance(int ClientID)
 	return true;
 }
 
+void CGameControllerFLY::Snap(int SnappingClient)
+{
+	IGameController::Snap(SnappingClient);
+
+	CNetObj_GameData *pGameDataObj = (CNetObj_GameData *)Server()->SnapNewItem(NETOBJTYPE_GAMEDATA, 0, sizeof(CNetObj_GameData));
+	if(!pGameDataObj)
+		return;
+
+	pGameDataObj->m_TeamscoreRed = m_aTeamscore[TEAM_RED];
+	pGameDataObj->m_TeamscoreBlue = m_aTeamscore[TEAM_BLUE];
+
+	if(m_apFlags[TEAM_RED])
+	{
+		if(m_apFlags[TEAM_RED]->m_AtStand)
+			pGameDataObj->m_FlagCarrierRed = FLAG_ATSTAND;
+		else if(m_apFlags[TEAM_RED]->m_pCarryingCharacter && m_apFlags[TEAM_RED]->m_pCarryingCharacter->GetPlayer())
+			pGameDataObj->m_FlagCarrierRed = m_apFlags[TEAM_RED]->m_pCarryingCharacter->GetPlayer()->GetCID();
+		else
+			pGameDataObj->m_FlagCarrierRed = FLAG_TAKEN;
+	}
+	else
+		pGameDataObj->m_FlagCarrierRed = FLAG_MISSING;
+	if(m_apFlags[TEAM_BLUE])
+	{
+		if(m_apFlags[TEAM_BLUE]->m_AtStand)
+			pGameDataObj->m_FlagCarrierBlue = FLAG_ATSTAND;
+		else if(m_apFlags[TEAM_BLUE]->m_pCarryingCharacter && m_apFlags[TEAM_BLUE]->m_pCarryingCharacter->GetPlayer())
+			pGameDataObj->m_FlagCarrierBlue = m_apFlags[TEAM_BLUE]->m_pCarryingCharacter->GetPlayer()->GetCID();
+		else
+			pGameDataObj->m_FlagCarrierBlue = FLAG_TAKEN;
+	}
+	else
+		pGameDataObj->m_FlagCarrierBlue = FLAG_MISSING;
+}
+
 void CGameControllerFLY::Tick()
 {
 	IGameController::Tick();
