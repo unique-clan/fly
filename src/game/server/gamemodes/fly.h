@@ -12,7 +12,8 @@ public:
 	CGameControllerFLY(class CGameContext *pGameServer);
 	
 	void InitTeleporter();
-	
+
+	virtual void DoWincheck();	
 	virtual bool CanBeMovedOnBalance(int ClientID);
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
