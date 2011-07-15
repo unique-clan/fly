@@ -52,9 +52,15 @@ void CLayers::Init(class IKernel *pKernel)
 
 					//break;
 				}
-
-				if(pTilemap->m_Flags&2)
+				else if(pTilemap->m_Flags&2)
+				{
+					if(pTilemap->m_Version < 3) // get the right values for tele layer
+					{
+						int *pTele = (int*)(pTilemap)+15;
+						pTilemap->m_Tele = *pTele;
+					}
 					m_pTeleLayer = pTilemap;
+				}
 			}
 		}
 	}
