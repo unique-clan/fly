@@ -147,7 +147,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 			float Dmg = 6 * l;
 			if((int)Dmg)
 			{
-				if(Weapon == WEAPON_GRENADE)
+				if(Weapon == WEAPON_GRENADE || Weapon == WEAPON_RIFLE)
 				{
 					apEnts[i]->m_LastHitBy = Owner;
 					apEnts[i]->m_HitTick = Server()->Tick();
@@ -1323,6 +1323,17 @@ void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *p
 	}
 }
 
+void CGameContext::ConchainInstagibupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
+{
+	int Instagib = g_Config.m_SvInstagib;
+	pfnCallback(pResult, pCallbackUserData);
+	if(pResult->NumArguments() && Instagib != g_Config.m_SvInstagib)
+	{
+		CGameContext *pSelf = (CGameContext *)pUserData;
+		pSelf->Server()->MapReload();
+	}
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1346,6 +1357,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("vote", "r", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
+	Console()->Chain("sv_instagib", ConchainInstagibupdate, this);
 }
 
 void CGameContext::OnInit(/*class IKernel *pKernel*/)

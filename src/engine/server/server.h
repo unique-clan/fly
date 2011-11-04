@@ -194,6 +194,8 @@ public:
 	char *GetMapName();
 	int LoadMap(const char *pMapName);
 
+	void MapReload();
+
 	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, IConsole *pConsole);
 	int Run();
 

@@ -57,8 +57,16 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 {
 	m_EmoteStop = -1;
 	m_LastAction = -1;
-	m_ActiveWeapon = WEAPON_GUN;
-	m_LastWeapon = WEAPON_HAMMER;
+	if(g_Config.m_SvInstagib)
+	{
+		m_ActiveWeapon = WEAPON_RIFLE;
+		m_LastWeapon = WEAPON_RIFLE;
+	}
+	else
+	{
+		m_ActiveWeapon = WEAPON_GUN;
+		m_LastWeapon = WEAPON_HAMMER;
+	}
 	m_QueuedWeapon = -1;
 
 	m_pPlayer = pPlayer;
@@ -789,6 +797,10 @@ void CCharacter::Die(int Killer, int Weapon)
 bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	m_Core.m_Vel += Force;
+
+	// so we dont have dmg for laserjumps
+	if(g_Config.m_SvInstagib)
+		return false;
 
 	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
 		return false;

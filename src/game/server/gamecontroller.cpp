@@ -161,7 +161,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		SubType = WEAPON_NINJA;
 	}
 
-	if(Type != -1)
+	if(Type != -1 && !g_Config.m_SvInstagib)
 	{
 		CPickup *pPickup = new CPickup(&GameServer()->m_World, Type, SubType);
 		pPickup->m_Pos = Pos;
@@ -363,8 +363,13 @@ void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 	pChr->IncreaseHealth(10);
 
 	// give default weapons
-	pChr->GiveWeapon(WEAPON_HAMMER, -1);
-	pChr->GiveWeapon(WEAPON_GUN, 10);
+	if(g_Config.m_SvInstagib)
+		pChr->GiveWeapon(WEAPON_RIFLE, -1);
+	else
+	{
+		pChr->GiveWeapon(WEAPON_HAMMER, -1);
+		pChr->GiveWeapon(WEAPON_GUN, 10);
+	}
 }
 
 void IGameController::DoWarmup(int Seconds)

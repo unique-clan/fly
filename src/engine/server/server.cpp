@@ -1150,6 +1150,11 @@ int CServer::LoadMap(const char *pMapName)
 	return 1;
 }
 
+void CServer::MapReload()
+{
+	m_MapReload = 1;
+}
+
 void CServer::InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, IConsole *pConsole)
 {
 	m_Register.Init(pNetServer, pMasterServer, pConsole);

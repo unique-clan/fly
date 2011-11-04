@@ -12,7 +12,10 @@ CGameControllerFLY::CGameControllerFLY(class CGameContext *pGameServer)
 {
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
-	m_pGameType = "Fly";
+	if(g_Config.m_SvInstagib)
+		m_pGameType = "iFly";
+	else
+		m_pGameType = "Fly";
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_FLAGS;
 	
 	InitTeleporter();

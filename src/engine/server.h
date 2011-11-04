@@ -60,6 +60,8 @@ public:
 	virtual void Kick(int ClientID, const char *pReason) = 0;
 
 	virtual void DemoRecorder_HandleAutoStart() = 0;
+
+	virtual void MapReload() = 0;
 };
 
 class IGameServer : public IInterface
