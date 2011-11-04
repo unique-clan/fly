@@ -63,6 +63,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
+	m_PrevPos = Pos;
 
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
@@ -554,19 +555,28 @@ void CCharacter::Tick()
 		m_pPlayer->m_ForceBalanced = false;
 	}
 
+	// save jumping state
+	int Jumped = m_Core.m_Jumped;
+
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 
-	// teleporter
-	int z = GameServer()->Collision()->IsTeleport(m_Pos.x, m_Pos.y);
+	// tile index
+	int TileIndex = GameServer()->Collision()->GetIndex(m_PrevPos, m_Pos);
+
+	// handle teleporter
+	int z = GameServer()->Collision()->IsTeleport(TileIndex);
 	if(g_Config.m_SvTeleport && z)
 	{
+		// check double jump
+		if(Jumped&3 && m_Core.m_Jumped != Jumped)
+			m_Core.m_Jumped = Jumped;
+				
 		m_Core.m_HookedPlayer = -1;
 		m_Core.m_HookState = HOOK_RETRACTED;
-		m_Core.m_TriggeredEvents |= COREEVENT_HOOK_RETRACT;
-		m_Core.m_HookState = HOOK_RETRACTED;
 		m_Core.m_Pos = ((CGameControllerFLY*)GameServer()->m_pController)->m_pTeleporter[z-1];
-		
+		m_Core.m_HookPos = m_Core.m_Pos;
+
 		// kill on teleport
 		if(g_Config.m_SvTeleportKill)
 		{
@@ -574,20 +584,23 @@ void CCharacter::Tick()
 				if(GameServer()->GetPlayerChar(i) && distance(GameServer()->GetPlayerChar(i)->m_Pos, m_Core.m_Pos) < 32)
 					GameServer()->GetPlayerChar(i)->Die(m_pPlayer->GetCID(), WEAPON_GAME);
 		}
-		
-		m_Core.m_HookPos = m_Core.m_Pos;
+
 		//Resetting velocity to prevent exploit
 		if(g_Config.m_SvTeleportVelReset)
 			m_Core.m_Vel = vec2(0,0);
+
 		if(g_Config.m_SvStrip)
 		{
 			m_ActiveWeapon = WEAPON_HAMMER;
 			m_LastWeapon = WEAPON_HAMMER;
 			m_aWeapons[0].m_Got = true;
 			for(int i = 1; i < NUM_WEAPONS; i++)
-			m_aWeapons[i].m_Got = false;
+				m_aWeapons[i].m_Got = false;
 		}
 	}
+	
+	// set Position just in case it was changed
+	m_Pos = m_Core.m_Pos;
 
 	// player <-> player collision
 	if(GameServer()->Tuning()->m_PlayerCollision)
@@ -632,7 +645,8 @@ void CCharacter::Tick()
 
 	// Previnput
 	m_PrevInput = m_Input;
-	return;
+
+	m_PrevPos = m_Core.m_Pos;
 }
 
 void CCharacter::TickDefered()

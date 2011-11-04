@@ -128,6 +128,8 @@ private:
 	// the player core for the physics
 	CCharacterCore m_Core;
 
+	vec2 m_PrevPos;
+
 	// info for dead reckoning
 	int m_ReckoningTick; // tick that we are performing dead reckoning From
 	CCharacterCore m_SendCore; // core that we should send

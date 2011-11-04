@@ -70,17 +70,47 @@ bool CCollision::IsTileSolid(int x, int y)
 	return GetTile(x, y)&COLFLAG_SOLID;
 }
 
-int CCollision::IsTeleport(int x, int y)
+// fly
+int CCollision::GetIndex(vec2 PrevPos, vec2 Pos)
 {
-	if(!m_pTele)
+	float Distance = distance(PrevPos, Pos);
+	
+	if(!Distance)
+	{
+		int Nx = clamp((int)Pos.x/32, 0, m_Width-1);
+		int Ny = clamp((int)Pos.y/32, 0, m_Height-1);
+		
+		if(m_pTele && m_pTele[Ny*m_Width+Nx].m_Type == TILE_TELEIN)
+			return Ny*m_Width+Nx;
+	}
+	
+	float a = 0.0f;
+	vec2 Tmp = vec2(0, 0);
+	int Nx = 0;
+	int Ny = 0;
+	
+	for(float f = 0; f < Distance; f++)
+	{
+		a = f/Distance;
+		Tmp = mix(PrevPos, Pos, a);
+		Nx = clamp((int)Tmp.x/32, 0, m_Width-1);
+		Ny = clamp((int)Tmp.y/32, 0, m_Height-1);
+
+		if(m_pTele && m_pTele[Ny*m_Width+Nx].m_Type == TILE_TELEIN)
+			return Ny*m_Width+Nx;
+	}
+	
+	return -1;
+}
+
+int CCollision::IsTeleport(int Index)
+{
+	if(!m_pTele || Index < 0)
 		return 0;
 	
-	int nx = clamp(x/32, 0, m_Width-1);
-	int ny = clamp(y/32, 0, m_Height-1);
-	
 	int Tele = 0;
-	if(m_pTele[ny*m_pLayers->TeleLayer()->m_Width+nx].m_Type == TILE_TELEIN)
-		Tele = m_pTele[ny*m_pLayers->TeleLayer()->m_Width+nx].m_Number;
+	if(m_pTele[Index].m_Type == TILE_TELEIN)
+		Tele = m_pTele[Index].m_Number;
 		
 	return Tele;
 }

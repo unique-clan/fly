@@ -35,8 +35,9 @@ public:
 	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity);
 	bool TestBox(vec2 Pos, vec2 Size);
 	
-	// teleporter stuff
-	int IsTeleport(int x, int y);
+	// fly
+	int GetIndex(vec2 PrevPos, vec2 Pos);
+	int IsTeleport(int Index);
 	
 	class CTeleTile *m_pTele;
 	
