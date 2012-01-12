@@ -92,6 +92,15 @@ public:
 	unsigned char m_Reserved;
 };
 
+struct CMapItemInfo
+{
+	int m_Version;
+	int m_Author;
+	int m_MapVersion;
+	int m_Credits;
+	int m_License;
+} ;
+
 struct CTeleTile
 {
 	unsigned char m_Number;
